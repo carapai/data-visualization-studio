@@ -22,6 +22,13 @@ function UsersComponent() {
                     templateId: data.template,
                     dashboardId: data.defaultDashboard,
                 }}
+                search={{
+                    mclvD0Z9mfT: data.organisationUnits.map((e) =>
+                        String(e.key)
+                    ),
+                    GQhi6pRnTKF: 1,
+                    ww1uoD3DsYg: 2,
+                }}
             />
         );
 
@@ -31,6 +38,13 @@ function UsersComponent() {
                 to="/$templateId"
                 params={{
                     templateId: data.template,
+                }}
+                search={{
+                    mclvD0Z9mfT: data.organisationUnits.map((e) =>
+                        String(e.key)
+                    ),
+                    GQhi6pRnTKF: 1,
+                    ww1uoD3DsYg: 2,
                 }}
             />
         );

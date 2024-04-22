@@ -31,7 +31,7 @@ export default function CategoryList({ visualization }: ChartProps) {
     const search = useSearch({
         strict: false,
     });
-    const navigate = useNavigate({ from: "/$templateId/$dashboardId" });
+    const navigate = useNavigate({ from: "/$templateId" });
     const { isLoading, isSuccess, isError, error, data } = useCategoryList();
     const type = visualization.properties["type"] || "list";
 

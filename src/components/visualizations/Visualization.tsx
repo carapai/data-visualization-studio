@@ -7,6 +7,8 @@ import { useVisualizationMetadata } from "../hooks/useVisualizationMetadata";
 
 // import { deriveSingleValues } from "../../utils/utils";
 // import DashboardTree from "../DashboardTree";
+import { useSearch } from "@tanstack/react-router";
+import { deriveSingleValues } from "../../utils";
 import LoadingIndicator from "../LoadingIndicator";
 import AreaGraph from "./AreaGraph";
 import BarGraph from "./BarGraph";
@@ -38,8 +40,6 @@ import SunburstChart from "./SunburstChart";
 import Tables from "./Tables";
 import TextVisualisation from "./TextVisualisation";
 import TreeMaps from "./TreeMaps";
-import { getRouteApi } from "@tanstack/react-router";
-import { deriveSingleValues } from "../../utils";
 
 type VisualizationProps = {
     visualization: IVisualization;
@@ -194,16 +194,12 @@ const VisualizationMetaData = ({
     return null;
 };
 
-const routeApi = getRouteApi("/$templateId/$dashboardId");
-
 const Visualization = ({
     visualization,
     section,
     metadata,
 }: VisualizationProps) => {
-    // const calculated = useStore($calculated);
-    // const { affected, optionSet } = search;
-    const { refresh } = routeApi.useSearch();
+    const { refresh } = useSearch({ strict: false });
     const { isLoading, isSuccess, data, isError } = useVisualization(
         metadata,
         refresh

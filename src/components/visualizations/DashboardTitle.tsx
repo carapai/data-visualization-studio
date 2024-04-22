@@ -2,10 +2,10 @@ import { Stack, Text } from "@chakra-ui/react";
 import { getRouteApi } from "@tanstack/react-router";
 import { ChartProps } from "../../interfaces";
 
-const apiRoute = getRouteApi("/$templateId/$dashboardId");
+const apiRoute = getRouteApi("/$templateId");
 
 export default function DashboardTitle({ visualization }: ChartProps) {
-    const dashboard = apiRoute.useLoaderData();
+    const { dashboard } = apiRoute.useLoaderData();
     return (
         <Stack justifyContent="center">
             {dashboard.name && (

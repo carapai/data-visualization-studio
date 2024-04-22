@@ -4,11 +4,12 @@ import { Stack, Text } from "@chakra-ui/react";
 // import { storeApi } from "../../Events";
 // import { $store } from "../../Store";
 // import OUTree from "../OUTree";
+
 export default function OrgUnitPicker() {
     // const { isOpen, onToggle } = useDisclosure();
     // const store = useStore($store);
     return (
-        <Stack position="relative" flex={1}>
+        <Stack position="relative">
             <Text>OrgUnitPicker</Text>
         </Stack>
     );

@@ -1,8 +1,4 @@
 import { z } from "zod";
-// import type { BoxProps } from "@chakra-ui/react";
-// import type { DataNode as IDataNode } from "antd/es/tree";
-// import { AxiosInstance } from "axios";
-// import { OptionBase } from "chakra-react-select";
 
 export const PeriodTypeSchema = z.enum(["fixed", "relative", "range"]);
 export const PeriodSchema = z.object({
@@ -17,10 +13,14 @@ export const searchSchema = z
         refresh: z.string().catch(""),
         affected: z.string().catch(""),
         optionSet: z.string().catch(""),
-        selectedKeys: z.string().array().catch([]),
+        selected: z.string().array().catch([]),
+        expanded: z.string().array().catch([]),
         attribution: z.record(z.string(), z.string().array()).catch({}),
-        ou: z.string().array().catch([]),
-        pe: PeriodTypeSchema.array().catch([]),
+        mclvD0Z9mfT: z.string().array().catch([]), //ou
+        m5D13FqKZwN: PeriodTypeSchema.array().catch([]), //period
+        GQhi6pRnTKF: z.number().catch(1), // level
+        ww1uoD3DsYg: z.number().catch(2), //sublevel
+        oug: z.string().array().catch([]),
     })
     .partial();
 

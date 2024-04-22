@@ -8,7 +8,12 @@ import {
     getDHIS2Resource,
     getDHIS2Resources,
 } from "../utils";
-import { CategoryCombo, IDashboard, IDashboardSetting } from "../interfaces";
+import {
+    CategoryCombo,
+    DataNode,
+    IDashboard,
+    IDashboardSetting,
+} from "../interfaces";
 
 export const usersQueryOptions = queryOptions({
     queryKey: ["users"],
@@ -22,6 +27,18 @@ export const initialQueryOptions = queryOptions({
             "i-dashboard-settings",
             "settings"
         );
+        // if (settings.defaultDashboard) {
+        //     const dashboard = await getDHIS2NamespaceKeyData<IDashboard>(
+        //         "i-dashboards",
+        //         settings.defaultDashboard
+        //     );
+        // }
+        // if (settings.template) {
+        //     const template = await getDHIS2NamespaceKeyData<IDashboard>(
+        //         "i-dashboards",
+        //         settings.template
+        //     );
+        // }
         const data = await getDHIS2Resources<TreeDataNode>({
             resource: "me.json",
             resourceKey: "dataViewOrganisationUnits",
@@ -72,5 +89,24 @@ export const templateQueryOptions = (key: string) =>
             }
 
             return { dashboard };
+        },
+    });
+
+export const orgUnitChildrenOptions = (orgUnit: string) =>
+    queryOptions({
+        queryKey: ["user-organisations", orgUnit],
+        queryFn: async () => {
+            const data = await getDHIS2Resource<{
+                organisationUnits: Array<{ children: DataNode[] }>;
+            }>({
+                resource: "organisationUnits.json",
+                isCurrentDHIS2: true,
+                params: {
+                    fields: "children[id~rename(key),name~rename(title),leaf~rename(isLeaf),level]",
+                    filter: `id:in:[${orgUnit}]`,
+                    order: "shortName:desc",
+                },
+            });
+            return data.organisationUnits.flatMap(({ children }) => children);
         },
     });

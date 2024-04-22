@@ -90,12 +90,6 @@ export default function FixedDashboard({
                                         : "15vh"
                                     : "100%"
                             }
-                            // onClick={(e: MouseEvent<HTMLElement>) => {
-                            //     if (e.detail === 2 && store.isAdmin) {
-                            //         sectionApi.setCurrentSection(section);
-                            //         isOpenApi.onOpen();
-                            //     }
-                            // }}
                         >
                             <Outlet />
                         </GridItem>
@@ -127,12 +121,6 @@ export default function FixedDashboard({
                                 : "100%"
                         }
                         w="100%"
-                        // onClick={(e: MouseEvent<HTMLElement>) => {
-                        //     if (e.detail === 2 && store.isAdmin) {
-                        //         sectionApi.setCurrentSection(section);
-                        //         isOpenApi.onOpen();
-                        //     }
-                        // }}
                     >
                         <SectionVisualization
                             section={section}

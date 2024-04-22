@@ -1,5 +1,5 @@
 import type { BoxProps } from "@chakra-ui/react";
-import type { DataNode as IDataNode } from "antd/es/tree";
+import type { TreeDataNode as IDataNode } from "antd";
 import { AxiosInstance } from "axios";
 import { OptionBase } from "chakra-react-select";
 import { Period } from "./schemas";
@@ -48,6 +48,12 @@ export interface INamed {
     name?: string;
     description?: string;
     order?: string;
+}
+
+export interface ILevel {
+    id: string;
+    name: string;
+    level: number;
 }
 export interface IDashboardSetting extends INamed {
     defaultDashboard: string;
@@ -207,24 +213,7 @@ export interface Pagination {
     pageSize: number;
 }
 export interface DataNode extends IDataNode {
-    id?: string;
-    value?: string;
-    pId: string;
-    children?: DataNode[];
-    type?: string;
-    nodeSource?: { [key: string]: any };
-    hasChildren?: boolean;
-    bg?: string;
-    actual?: string;
-    parent?: { [key: string]: any };
-    order?: string;
     level?: number;
-    metadata?: Partial<{
-        rows: number;
-        columns: number;
-        rowsPerPage: number;
-    }>;
-    filter?: string;
 }
 
 export interface Option extends OptionBase {
