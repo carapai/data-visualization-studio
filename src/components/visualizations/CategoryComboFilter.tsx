@@ -1,7 +1,7 @@
 import { Progress, Stack } from "@chakra-ui/react";
 import { GroupBase, Select } from "chakra-react-select";
 import { INamed, MetadataAPI } from "../../interfaces";
-import { useDHIS2CategoryCombos } from "../hooks/useDHIS2CategoryCombo";
+import { useDHIS2CategoryCombos } from "../hooks/useDHIS2CategoryCombos";
 
 export default function CategoryComboFilter({
     api,

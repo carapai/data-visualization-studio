@@ -12,6 +12,7 @@ export const useDHIS2CategoryCombos = (
         fields: "id,name",
         filter: "dataDimensionType:eq:ATTRIBUTE",
     };
+
     return useQuery<Array<INamed>, Error>({
         queryKey: ["category-combos"],
         queryFn: async () => {

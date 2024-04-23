@@ -1,11 +1,13 @@
 import { z } from "zod";
 
 export const PeriodTypeSchema = z.enum(["fixed", "relative", "range"]);
+
 export const PeriodSchema = z.object({
-    value: z.string(),
+    value: z.string().optional(),
+    label: z.string().optional(),
     startDate: z.string().optional(),
     endDate: z.string().optional(),
-    type: PeriodTypeSchema.array(),
+    type: PeriodTypeSchema.optional(),
 });
 
 export const searchSchema = z
@@ -17,9 +19,10 @@ export const searchSchema = z
         expanded: z.string().array().catch([]),
         attribution: z.record(z.string(), z.string().array()).catch({}),
         mclvD0Z9mfT: z.string().array().catch([]), //ou
-        m5D13FqKZwN: PeriodTypeSchema.array().catch([]), //period
+        m5D13FqKZwN: PeriodSchema.array().catch([]), //period
         GQhi6pRnTKF: z.number().catch(1), // level
         ww1uoD3DsYg: z.number().catch(2), //sublevel
+        of2WvtwqbHR: z.string().array().catch([]), //ou groups
         oug: z.string().array().catch([]),
     })
     .partial();
@@ -630,4 +633,4 @@ export const CategoryComboSchema = z.object({
 });
 
 export type ProductSearch = z.infer<typeof searchSchema>;
-export type Period = z.infer<typeof PeriodTypeSchema>;
+export type Period = z.infer<typeof PeriodSchema>;

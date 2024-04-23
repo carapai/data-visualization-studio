@@ -228,8 +228,8 @@ export type Item = {
 };
 
 export type PickerProps = {
-    selectedPeriods: Period[];
-    onChange: (periods: Period[], remove: boolean) => void;
+    selectedPeriods?: Period[];
+    onChange: (periods: Period[]) => void;
 };
 export interface IStore {
     showSider: boolean;
@@ -455,8 +455,7 @@ export type FixedPeriod = {
 };
 
 // export type PeriodType = "fixed" | "relative" | "range";
-// export interface Period {
-//     value: string;
+// export interface Period extends Option {
 //     startDate?: string;
 //     endDate?: string;
 //     type: PeriodType;

@@ -7,6 +7,10 @@ import OrgUnitTree from "../filters/OrgUnitTree";
 import { Button } from "../ui/button";
 import { useSearch, useNavigate } from "@tanstack/react-router";
 import OrgUnitLevels from "../filters/OrgUnitLevels";
+import PeriodSelector from "../filters/PeriodSelector";
+import { Period } from "@/schemas";
+import OrgUnitGroups from "../filters/OrgUnitGroups";
+import Categories from "../filters/CategoryCombo";
 
 export default function Filters() {
     const search = useSearch({ strict: false });
@@ -35,13 +39,29 @@ export default function Filters() {
             }),
         });
     };
+    const onPeriodChange = (periods: Period[]) => {
+        navigate({
+            search: (prev) => ({
+                ...prev,
+                m5D13FqKZwN: periods,
+            }),
+        });
+    };
+    const onChangeOrgUnitGroups = (groups: string[] | undefined) => {
+        navigate({
+            search: (prev) => ({
+                ...prev,
+                of2WvtwqbHR: groups,
+            }),
+        });
+    };
 
     return (
         <Popover>
             <PopoverTrigger>
                 <Button>Filters</Button>
             </PopoverTrigger>
-            <PopoverContent className="h-[700px] overflow-auto">
+            <PopoverContent className="h-[700px] overflow-auto w-[800px] flex-col gap-20">
                 <OrgUnitTree
                     selectedKeys={search.selected ?? []}
                     expandedKeys={search.expanded ?? []}
@@ -61,6 +81,15 @@ export default function Filters() {
                         })
                     }
                 />
+                <PeriodSelector
+                    onChange={onPeriodChange}
+                    selectedPeriods={search.m5D13FqKZwN}
+                />
+                <OrgUnitGroups
+                    value={search.of2WvtwqbHR}
+                    onChange={onChangeOrgUnitGroups}
+                />
+                <Categories direction="row" id="jM9iOYVuIIp" />
             </PopoverContent>
         </Popover>
     );

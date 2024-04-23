@@ -1,28 +1,36 @@
 import { useQuery } from "@tanstack/react-query";
 import { AxiosInstance } from "axios";
-import { INamed } from "../../interfaces";
-import { getDHIS2Resources } from "../../utils";
+import { CategoryCombo } from "../../interfaces";
+import { getDHIS2Resource } from "../../utils";
 
-export const useDHIS2CategoryCombos = (
+export const useDHIS2CategoryCombo = (
     isCurrentDHIS2: boolean | undefined | null,
-    api: AxiosInstance | undefined | null
+    api: AxiosInstance | undefined | null,
+    id: string
 ) => {
     const params = {
-        paging: "false",
-        fields: "id,name",
-        filter: "dataDimensionType:eq:ATTRIBUTE",
+        fields: "categories[id,name,shortName,categoryOptions[id,name,startDate,endDate]],categoryOptionCombos[id,categoryOptions]",
     };
-
-    return useQuery<Array<INamed>, Error>({
-        queryKey: ["category-combos"],
+    return useQuery<CategoryCombo, Error>({
+        queryKey: ["category-combo", id],
         queryFn: async () => {
-            return getDHIS2Resources<INamed>({
+            const categoryCombo = await getDHIS2Resource<CategoryCombo>({
                 isCurrentDHIS2,
-                resource: "categoryCombos.json",
                 params,
                 api,
-                resourceKey: "categoryCombos",
+                resource: `categoryCombos/${id}.json`,
             });
+            // dashboardCategoryComboApi.set(categoryCombo);
+
+            // categoryCombo.categories.forEach((c) => {
+            //     const valid = c.categoryOptions.filter(
+            //         (a) => a.endDate === undefined
+            //     );
+            //     attributionApi.add({
+            //         [c.id]: valid.map((e) => e.id).join(","),
+            //     });
+            // });
+            return categoryCombo;
         },
     });
 };
