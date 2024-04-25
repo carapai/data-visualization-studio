@@ -738,7 +738,6 @@ const lastNPeriods = (
     periodType: ManipulateType,
     includeCurrent: boolean = false
 ) => {
-    /*The momentjs fomarts for the periodsTypes*/
     const dateFormats: { [key: string]: string } = {
         days: "YYYYMMDD",
         weeks: "YYYY[W]W",
@@ -748,7 +747,6 @@ const lastNPeriods = (
     };
 
     const periods = new Set<string>();
-    /* toLocaleUpperCase() is added because of special treatment to quarters formating*/
     if (n === 0) {
         periods.add(dayjs().format(dateFormats[periodType]));
         return Array.from(periods);

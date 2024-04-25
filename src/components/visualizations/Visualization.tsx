@@ -199,10 +199,11 @@ const Visualization = ({
     section,
     metadata,
 }: VisualizationProps) => {
-    const { refresh } = useSearch({ strict: false });
+    const { refresh, ...globalFilters } = useSearch({ strict: false });
     const { isLoading, isSuccess, data, isError } = useVisualization(
         metadata,
-        refresh
+        refresh,
+        globalFilters
     );
     return (
         <>

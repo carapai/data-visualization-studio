@@ -10,6 +10,9 @@ import {
 } from "lodash";
 import { evaluate } from "mathjs";
 
+import axios from "axios";
+import { omit } from "lodash/fp";
+import axiosInstance from "../../axios-instance";
 import {
     IData2,
     IDimension,
@@ -17,10 +20,7 @@ import {
     IIndicator2,
     IVisualization2,
 } from "../../interfaces";
-import axios from "axios";
-import axiosInstance from "../../axios-instance";
 import { flattenDHIS2Data, merge2DataSources } from "../../utils";
-import { omit } from "lodash/fp";
 
 const getSearchParams = (query?: string) => {
     if (query) {
@@ -166,9 +166,14 @@ const makeSQLViewsQueries = (
     let initial = otherParameters;
     Object.entries(expressions).forEach(([col, val]) => {
         if (val.isGlobal && globalFilters[val.value]) {
+            let newGlobalValue = globalFilters[val.value];
+
+            if (isArray(globalFilters[val.value])) {
+                newGlobalValue = globalFilters[val.value].join("-");
+            }
             initial = {
                 ...initial,
-                [`var=${col}`]: globalFilters[val.value].join("-"),
+                [`var=${col}`]: newGlobalValue,
             };
         } else if (!val.isGlobal && val.value) {
             const keys = Object.keys(globalFilters).some(
@@ -177,10 +182,14 @@ const makeSQLViewsQueries = (
             if (keys) {
                 Object.entries(globalFilters).forEach(
                     ([globalId, globalValue]) => {
+                        let newGlobalValue = globalValue;
                         if (String(val.value).indexOf(globalId) !== -1) {
+                            if (isArray(globalValue)) {
+                                newGlobalValue = globalValue.join("-");
+                            }
                             let currentValue = val.value.replaceAll(
                                 globalId,
-                                globalValue.join("-")
+                                newGlobalValue
                             );
                             const calcIndex = currentValue.indexOf("calc");
                             if (calcIndex !== -1) {
