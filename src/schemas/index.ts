@@ -24,6 +24,8 @@ export const searchSchema = z
         ww1uoD3DsYg: z.number().catch(2), //sublevel
         of2WvtwqbHR: z.string().array().catch([]), //ou groups
         oug: z.string().array().catch([]),
+        minLevel: z.number().catch(5),
+        maxLevel: z.number().catch(1),
     })
     .partial();
 

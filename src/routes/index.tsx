@@ -26,8 +26,13 @@ function UsersComponent() {
                     mclvD0Z9mfT: data.organisationUnits.map((e) =>
                         String(e.key)
                     ),
-                    GQhi6pRnTKF: 1,
-                    ww1uoD3DsYg: 2,
+                    GQhi6pRnTKF: data.minLevel,
+                    ww1uoD3DsYg:
+                        data.minLevel < data.maxLevel
+                            ? data.minLevel + 1
+                            : data.minLevel,
+                    minLevel: data.minLevel,
+                    maxLevel: data.maxLevel,
                 }}
             />
         );
@@ -43,8 +48,13 @@ function UsersComponent() {
                     mclvD0Z9mfT: data.organisationUnits.map((e) =>
                         String(e.key)
                     ),
-                    GQhi6pRnTKF: 1,
-                    ww1uoD3DsYg: 2,
+                    GQhi6pRnTKF: data.minLevel,
+                    ww1uoD3DsYg:
+                        data.minLevel < data.maxLevel
+                            ? data.minLevel + 1
+                            : data.minLevel,
+                    minLevel: data.minLevel,
+                    maxLevel: data.maxLevel,
                 }}
             />
         );

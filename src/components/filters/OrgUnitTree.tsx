@@ -16,6 +16,7 @@ function OUTree({
     onExpandKey,
     onSelectKey,
     checkedKeys,
+    onLevelChange,
 }: {
     data: DataNode[];
     expandedKeys: React.Key[];
@@ -24,6 +25,7 @@ function OUTree({
     onCheckKey: (checkedKeys: React.Key[]) => void;
     onExpandKey: (expandedKeys: React.Key[]) => void;
     onSelectKey: (selectedKeys: React.Key[]) => void;
+    onLevelChange?: (level: number) => void;
 }) {
     const queryClient = useQueryClient();
     const [treeData, setTreeData] = useState(data);
@@ -44,8 +46,11 @@ function OUTree({
         if (data.level === level) {
             onCheckKey(allChecked);
         } else {
-            setLevel(() => data.level ?? 1);
             onCheckKey([info.node.key]);
+            setLevel(() => data.level ?? 1);
+            if (onLevelChange) {
+                onLevelChange(data.level ?? 1);
+            }
         }
     };
     const onExpand: TreeProps["onExpand"] = (expandedKeys) => {
@@ -106,6 +111,7 @@ export default function OrgUnitTree({
     onExpandKey,
     onSelectKey,
     checkedKeys,
+    onLevelChange,
 }: {
     expandedKeys: React.Key[];
     selectedKeys: React.Key[];
@@ -113,6 +119,7 @@ export default function OrgUnitTree({
     onCheckKey: (checkedKeys: React.Key[]) => void;
     onExpandKey: (expandedKeys: React.Key[]) => void;
     onSelectKey: (selectedKeys: React.Key[]) => void;
+    onLevelChange?: (level: number) => void;
 }) {
     const { error, isError, isLoading, data, isSuccess } =
         useUserOrganisations();
@@ -130,6 +137,7 @@ export default function OrgUnitTree({
                 onExpandKey={onExpandKey}
                 onSelectKey={onSelectKey}
                 checkedKeys={checkedKeys}
+                onLevelChange={onLevelChange}
             />
         );
 

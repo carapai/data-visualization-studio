@@ -13,6 +13,7 @@ import {
     DataNode,
     IDashboard,
     IDashboardSetting,
+    ILevel,
 } from "../interfaces";
 
 export const usersQueryOptions = queryOptions({
@@ -47,7 +48,21 @@ export const initialQueryOptions = queryOptions({
                 fields: "dataViewOrganisationUnits[id~rename(key),name~rename(title),leaf]",
             },
         });
-        return { organisationUnits: data, ...settings };
+        const levels = await getDHIS2Resources<ILevel>({
+            resource: "organisationUnitLevels.json",
+            resourceKey: "organisationUnitLevels",
+            isCurrentDHIS2: true,
+            params: {
+                fields: "id,name,level",
+                order: "level:asc",
+            },
+        });
+        return {
+            organisationUnits: data,
+            ...settings,
+            maxLevel: levels[levels.length - 1].level,
+            minLevel: levels[0].level,
+        };
     },
 });
 
