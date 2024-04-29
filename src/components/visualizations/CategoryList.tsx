@@ -17,7 +17,7 @@ import { ChartProps } from "../../interfaces";
 // import { useCategoryList } from "../../Queries";
 // import { $settings, $store, $path } from "../../Store";
 import { useSearch, useNavigate } from "@tanstack/react-router";
-import { useCategoryList } from "../hooks/useCategories";
+import { useCategoryList } from "../../hooks/useCategories";
 import LoadingIndicator from "../LoadingIndicator";
 import NavItem from "./NavItem";
 

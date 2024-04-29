@@ -4,13 +4,11 @@ import {
     GridItem,
     Stack,
     useBreakpointValue,
-    // useDisclosure,
 } from "@chakra-ui/react";
 import { useContextMenu } from "react-contexify";
 import "react-contexify/dist/ReactContexify.css";
 import Marquee from "react-marquee-slider";
 import { IDashboard, ISection } from "../interfaces";
-// import FullScreen from "./FullScreen";
 import Carousel from "./visualizations/Carousel";
 import TabPanelVisualization from "./visualizations/TabPanelVisualization";
 import Visualization from "./visualizations/Visualization";

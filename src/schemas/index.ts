@@ -634,5 +634,5 @@ export const CategoryComboSchema = z.object({
     categoryOptionCombos: CategoryOptionComboSchema.array(),
 });
 
-export type ProductSearch = z.infer<typeof searchSchema>;
+export type Search = z.infer<typeof searchSchema>;
 export type Period = z.infer<typeof PeriodSchema>;

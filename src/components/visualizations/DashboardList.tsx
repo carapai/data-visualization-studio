@@ -11,10 +11,10 @@ import React from "react";
 // import { storeApi } from "../../Events";
 import { DataNode, IDashboard, IVisualization } from "../../interfaces";
 // import { useDashboards, useFilterResources } from "../../Queries";
-import { useNamespaceData } from "../hooks/useNamespaceData";
+import { useNamespaceData } from "../../hooks/useNamespaceData";
 // import { $path, $settings, $store } from "../../Store";
 import LoadingIndicator from "../LoadingIndicator";
-import { useFilterResources } from "../hooks/useFilterResources";
+import { useFilterResources } from "../../hooks/useFilterResources";
 
 function DashboardItem({
     dashboards,

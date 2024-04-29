@@ -1,15 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-    VisualizationItems,
-    IVisualization,
-    Threshold,
-} from "../../interfaces";
+import { IVisualization, Threshold, VisualizationItems } from "../interfaces";
 import {
     createAxios,
     findParameters,
     getDHIS2Resource,
     processAnalyticsData,
-} from "../../utils";
+} from "../utils";
 
 export const getAnalyticsQuery = ({
     columns,
@@ -75,7 +71,6 @@ export const useDHIS2Visualization = (viz: IVisualization) => {
             if (viz.dataSource && viz.properties?.["visualization"]) {
                 const api = createAxios(viz.dataSource.authentication);
                 const visualization = await getDHIS2Resource<any>({
-                    isCurrentDHIS2: viz.dataSource.isCurrentDHIS2,
                     api,
                     resource: `visualizations/${viz.properties["visualization"]}.json`,
                     params: {
@@ -100,7 +95,6 @@ export const useDHIS2Visualization = (viz: IVisualization) => {
                 }>({
                     resource: `analytics.json?${params}`,
                     api,
-                    isCurrentDHIS2: viz.dataSource.isCurrentDHIS2,
                 });
                 let vals: { [key: string]: string[] } = {};
 

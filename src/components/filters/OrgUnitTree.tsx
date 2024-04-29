@@ -4,9 +4,10 @@ import type { TreeProps } from "antd";
 import { Tree } from "antd";
 import { EventDataNode } from "antd/es/tree";
 import { useState } from "react";
-import { useUserOrganisations } from "../hooks/useUserOrganisations";
+import { useUserOrganisations } from "../../hooks/useUserOrganisations";
 import LoadingIndicator from "../LoadingIndicator";
 import { DataNode } from "@/interfaces";
+import axiosInstance from "@/axios-instance";
 
 function OUTree({
     data,
@@ -83,7 +84,7 @@ function OUTree({
             return;
         }
         const data = await queryClient.ensureQueryData(
-            orgUnitChildrenOptions(String(key))
+            orgUnitChildrenOptions(axiosInstance, String(key))
         );
         setTreeData((origin) => updateTreeData(origin, key, data));
     };
@@ -130,7 +131,7 @@ export default function OrgUnitTree({
     if (isSuccess)
         return (
             <OUTree
-                data={data}
+                data={data.dataViewOrganisationUnits}
                 selectedKeys={selectedKeys}
                 expandedKeys={expandedKeys}
                 onCheckKey={onCheckKey}

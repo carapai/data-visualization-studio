@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { DataNode, IDashboard } from "../../interfaces";
+import { DataNode, IDashboard } from "../interfaces";
 import { fromPairs } from "lodash";
-import axiosInstance from "../../axios-instance";
+import axiosInstance from "../axios-instance";
 
 const queryTree = async (dashboard: IDashboard) => {
     let allData: DataNode[] = [];

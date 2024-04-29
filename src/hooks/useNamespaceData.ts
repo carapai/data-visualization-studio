@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getDHIS2NamespaceData } from "../../utils";
+import { getDHIS2NamespaceData } from "../utils";
 
 export const useNamespaceData = <TData>(namespace: string) => {
     return useQuery<TData[], Error>({

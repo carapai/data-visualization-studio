@@ -12,15 +12,16 @@ import { evaluate } from "mathjs";
 
 import axios from "axios";
 import { omit } from "lodash/fp";
-import axiosInstance from "../../axios-instance";
+import axiosInstance from "../axios-instance";
 import {
     IData2,
     IDimension,
     IExpressions,
     IIndicator2,
     IVisualization2,
-} from "../../interfaces";
-import { flattenDHIS2Data, merge2DataSources } from "../../utils";
+} from "../interfaces";
+import { flattenDHIS2Data, merge2DataSources } from "../utils";
+import { db } from "@/db";
 
 const getSearchParams = (query?: string) => {
     if (query) {
@@ -36,6 +37,8 @@ const generateKeys = (
     indicators: IIndicator2[] = [],
     globalFilters: { [key: string]: any } = {}
 ) => {
+    const { attribution, ...rest } = globalFilters;
+    const realGlobalFilters = { ...rest, ...attribution };
     const all = indicators.flatMap((indicator) => {
         const numKeys = Object.keys(indicator?.numerator?.dataDimensions || {});
         const denKeys = Object.keys(
@@ -57,7 +60,7 @@ const generateKeys = (
             ...numExpressions,
             ...denExpressions,
         ]).flatMap((id) => {
-            return globalFilters[id] || [id];
+            return realGlobalFilters[id] || [id];
         });
     });
     return uniq(all);
@@ -221,7 +224,7 @@ const makeSQLViewsQueries = (
 
 const getDHIS2Query = (
     query: IData2,
-    globalFilters: { [key: string]: any } = {}
+    globalFilters: { [key: string]: any }
 ) => {
     if (query.type === "ANALYTICS") {
         let params = makeDHIS2Query(query, globalFilters);
@@ -255,7 +258,7 @@ const getDHIS2Query = (
 
 const queryDHIS2 = async (
     vq: IData2 | undefined,
-    globalFilters: { [key: string]: any } = {}
+    globalFilters: { [key: string]: any }
 ) => {
     if (vq) {
         if (vq.dataSource && vq.dataSource.type === "DHIS2") {
@@ -290,29 +293,6 @@ const queryDHIS2 = async (
 
         if (vq.dataSource && vq.dataSource.type === "INDEX_DB") {
             return [];
-        }
-        if (
-            vq.dataSource &&
-            vq.dataSource.type === "ELASTICSEARCH" &&
-            vq.query
-        ) {
-            const { data } = await axios.post(
-                vq.dataSource.authentication.url,
-                JSON.parse(
-                    vq.query
-                        .replaceAll("${ou}", globalFilters["mclvD0Z9mfT"])
-                        .replaceAll("${pe}", globalFilters["m5D13FqKZwN"])
-                        .replaceAll("${le}", globalFilters["GQhi6pRnTKF"])
-                        .replaceAll("${gp}", globalFilters["of2WvtwqbHR"])
-                ),
-                {
-                    auth: {
-                        username: vq.dataSource.authentication.username,
-                        password: vq.dataSource.authentication.password,
-                    },
-                }
-            );
-            return data;
         }
     }
     return undefined;
@@ -532,17 +512,23 @@ const processVisualization = async (
     if (actualData.length === 1) {
         actualData = actualData[0];
     }
-    // let finalDimensions: { [key: string]: string[] } = {};
-    // let finalMetadata: { [key: string]: string } = {};
-    // data.forEach(({ dimensions, metadata }) => {
-    //     Object.entries(dimensions).forEach(([key, values]) => {
-    //         finalDimensions = {
-    //             ...finalDimensions,
-    //             [key]: [...values, ...(finalDimensions[key] || [])],
-    //         };
-    //     });
-    //     finalMetadata = { ...finalMetadata, ...metadata };
-    // });
+
+    let finalDimensions: { [key: string]: string[] } = {};
+    let finalMetadata: { [key: string]: string } = {};
+    data.forEach(({ dimensions, metadata }) => {
+        Object.entries(dimensions).forEach(([key, values]) => {
+            finalDimensions = {
+                ...finalDimensions,
+                [key]: [...values, ...(finalDimensions[key] || [])],
+            };
+        });
+        finalMetadata = { ...finalMetadata, ...metadata };
+    });
+
+    await db.data.put({
+        visualizationId: visualization.id,
+        data: actualData,
+    });
 
     // visualizationDimensionsApi.updateVisualizationData({
     //     visualizationId: visualization.id,
@@ -588,7 +574,5 @@ export const useVisualization = (
             );
         },
         refetchInterval: currentInterval,
-        refetchIntervalInBackground: true,
-        refetchOnWindowFocus: true,
     });
 };

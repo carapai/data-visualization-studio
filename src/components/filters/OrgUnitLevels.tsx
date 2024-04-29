@@ -1,6 +1,6 @@
 import { Stack, Text } from "@chakra-ui/react";
 import { GroupBase, Select } from "chakra-react-select";
-import { useOrgUnitLevels } from "../hooks/useOrgUnitLevels";
+import { useOrgUnitLevels } from "../../hooks/useOrgUnitLevels";
 import LoadingIndicator from "../LoadingIndicator";
 import { ILevel } from "@/interfaces";
 
@@ -19,9 +19,11 @@ export default function OrgUnitLevels({
             <Stack>
                 <Text>OrganisationUnit Level</Text>
                 <Select<ILevel, false, GroupBase<ILevel>>
-                    value={data.find((pt) => pt.level === value)}
+                    value={data.organisationUnitLevels.find(
+                        (pt) => pt.level === value
+                    )}
                     onChange={(e) => onChange(e?.level)}
-                    options={data}
+                    options={data.organisationUnitLevels}
                     isClearable
                     getOptionValue={(x) => String(x.level)}
                     getOptionLabel={(x) => x.name}

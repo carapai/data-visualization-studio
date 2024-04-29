@@ -12,7 +12,15 @@ import { routeTree } from "@/routeTree.gen";
 import { ChakraProvider } from "@chakra-ui/react";
 import LoadingIndicator from "./components/LoadingIndicator";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            retry: 1,
+        },
+    },
+});
 
 function decodeFromBinary(str: string): string {
     return decodeURIComponent(

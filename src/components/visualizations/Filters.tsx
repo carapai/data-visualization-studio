@@ -57,6 +57,14 @@ export default function Filters() {
         });
     };
 
+    const onComboChange = (category: string, values: string[]) => {
+        navigate({
+            search: (prev) => ({
+                ...prev,
+                attribution: { ...prev.attribution, [category]: values },
+            }),
+        });
+    };
     const onLevelChange = (level: number) => {
         navigate({
             search: (prev) => ({
@@ -104,7 +112,12 @@ export default function Filters() {
                         value={search.of2WvtwqbHR}
                         onChange={onChangeOrgUnitGroups}
                     />
-                    <Categories direction="row" id="jM9iOYVuIIp" />
+                    <Categories
+                        direction="row"
+                        id="jM9iOYVuIIp"
+                        attribution={search.attribution}
+                        onChange={onComboChange}
+                    />
                 </Stack>
             </PopoverContent>
         </Popover>

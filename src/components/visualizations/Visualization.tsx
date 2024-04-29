@@ -1,14 +1,19 @@
 import { Text } from "@chakra-ui/react";
 import { fromPairs } from "lodash";
 
-import { ISection, IVisualization, IVisualization2 } from "../../interfaces";
-import { useVisualization } from "../hooks/useVisualization";
-import { useVisualizationMetadata } from "../hooks/useVisualizationMetadata";
+import {
+    CategoryCombo,
+    ISection,
+    IVisualization,
+    IVisualization2,
+} from "../../interfaces";
+import { useVisualization } from "../../hooks/useVisualization";
+import { useVisualizationMetadata } from "../../hooks/useVisualizationMetadata";
 
 // import { deriveSingleValues } from "../../utils/utils";
 // import DashboardTree from "../DashboardTree";
-import { useSearch } from "@tanstack/react-router";
-import { deriveSingleValues } from "../../utils";
+import { useLoaderData, useSearch } from "@tanstack/react-router";
+import { arrayCombinations, deriveSingleValues } from "../../utils";
 import LoadingIndicator from "../LoadingIndicator";
 import AreaGraph from "./AreaGraph";
 import BarGraph from "./BarGraph";
@@ -40,6 +45,7 @@ import SunburstChart from "./SunburstChart";
 import Tables from "./Tables";
 import TextVisualisation from "./TextVisualisation";
 import TreeMaps from "./TreeMaps";
+import { Search } from "@/schemas";
 
 type VisualizationProps = {
     visualization: IVisualization;
@@ -47,11 +53,15 @@ type VisualizationProps = {
     section: ISection;
 };
 
-const getVisualization = (
-    visualization: IVisualization,
-    data: any,
-    section: ISection
-) => {
+const GetVisualization = ({
+    visualization,
+    data,
+    section,
+}: {
+    visualization: IVisualization;
+    data: any;
+    section: ISection;
+}) => {
     const dataProperties = fromPairs(
         Object.entries(visualization.properties || {}).filter(([key]) =>
             key.startsWith("data")
@@ -62,20 +72,14 @@ const getVisualization = (
             key.startsWith("layout")
         )
     );
-    const otherProperties = fromPairs(
-        Object.entries(visualization.properties || {}).filter(
-            ([key]) => !key.startsWith("layout") && !key.startsWith("data")
-        )
-    );
 
     const allTypes: { [key: string]: React.ReactNode } = {
-        single: <SingleValue />,
+        single: <SingleValue data={data} visualization={visualization} />,
         bar: (
             <BarGraph
                 data={data}
                 section={section}
                 visualization={visualization}
-                {...otherProperties}
                 layoutProperties={layoutProperties}
                 dataProperties={dataProperties}
             />
@@ -89,7 +93,6 @@ const getVisualization = (
                 section={section}
                 data={data}
                 visualization={visualization}
-                {...otherProperties}
                 layoutProperties={layoutProperties}
                 dataProperties={dataProperties}
             />
@@ -142,7 +145,6 @@ const getVisualization = (
                 section={section}
                 data={data}
                 visualization={visualization}
-                {...otherProperties}
                 layoutProperties={layoutProperties}
                 dataProperties={dataProperties}
             />
@@ -194,30 +196,70 @@ const VisualizationMetaData = ({
     return null;
 };
 
+const findFilters = (
+    categoryCombo: CategoryCombo | undefined,
+    globalFilters: Search
+) => {
+    const { attribution = {}, ...rest } = globalFilters;
+    let filters: { [key: string]: any } = rest;
+    const attributionKeys = Object.keys(attribution);
+    const attributionValues = Object.values(attribution);
+    if (categoryCombo?.categories?.length === attributionKeys.length) {
+        const combos = Object.entries(attribution).map(([, value]) => value);
+        const combinations = arrayCombinations<string>(...combos);
+        const all = combinations.flatMap((c) => {
+            const val = categoryCombo?.categoryOptionCombos?.find((a) =>
+                a.categoryOptions.every(({ id }) => c.flat().includes(id))
+            );
+            if (val) return val.id;
+            return [];
+        });
+        filters = { ...filters, WSiMOMi4QWh: all };
+    }
+
+    if (attributionKeys.length > 0 && attributionValues.length > 0) {
+        filters = {
+            ...filters,
+            DCtmg8VKCTI: attributionKeys,
+            ZqQdTbcqQhJ: attributionValues.flatMap((a) => a),
+        };
+    }
+
+    return filters;
+};
+
 const Visualization = ({
     visualization,
     section,
     metadata,
 }: VisualizationProps) => {
     const { refresh, ...globalFilters } = useSearch({ strict: false });
+    const loaderData2 = useLoaderData({ from: "/$templateId/$dashboardId" });
+    const filters = findFilters(loaderData2.categoryCombo, globalFilters);
     const { isLoading, isSuccess, data, isError } = useVisualization(
         metadata,
         refresh,
-        globalFilters
+        filters
     );
     return (
         <>
-            {visualization.expression &&
-                getVisualization(
-                    visualization,
-                    deriveSingleValues({}, visualization.expression),
-                    section
-                )}
+            {visualization.expression && (
+                <GetVisualization
+                    visualization={visualization}
+                    data={deriveSingleValues(visualization.expression)}
+                    section={section}
+                />
+            )}
             {!visualization.expression && (
                 <>
                     {isLoading && <LoadingIndicator />}
-                    {isSuccess &&
-                        getVisualization(visualization, data, section)}
+                    {isSuccess && (
+                        <GetVisualization
+                            visualization={visualization}
+                            data={data}
+                            section={section}
+                        />
+                    )}
                     {isError && <Text>ERR</Text>}
                 </>
             )}

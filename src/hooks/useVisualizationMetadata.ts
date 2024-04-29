@@ -6,9 +6,9 @@ import {
     IIndicator2,
     IVisualization,
     IVisualization2,
-} from "../../interfaces";
+} from "../interfaces";
 import { useQuery } from "@tanstack/react-query";
-import { getDHIS2NamespaceKeyData } from "../../utils";
+import { getDHIS2NamespaceKeyData } from "../utils";
 
 export const useVisualizationMetadata = (visualization: IVisualization) => {
     return useQuery<IVisualization2, Error>({

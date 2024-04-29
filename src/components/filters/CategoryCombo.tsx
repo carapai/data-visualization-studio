@@ -1,18 +1,22 @@
 import { CategoryOption } from "@/interfaces";
-import { Stack, Box, Text } from "@chakra-ui/react";
+import { Box, Stack, Text } from "@chakra-ui/react";
 import { GroupBase, Select } from "chakra-react-select";
-import { useDHIS2CategoryCombo } from "../hooks/useDHIS2CategoryCombo";
+import { useDHIS2CategoryCombo } from "../../hooks/useDHIS2CategoryCombo";
 import LoadingIndicator from "../LoadingIndicator";
 
 export default function Categories({
     id,
     direction,
+    attribution,
+    onChange,
 }: {
     id: string;
     direction: "row" | "column";
+    attribution: Record<string, string[]> | undefined;
+    onChange: (category: string, values: string[]) => void;
 }) {
     const { isLoading, isSuccess, isError, error, data } =
-        useDHIS2CategoryCombo(true, null, id);
+        useDHIS2CategoryCombo(id);
 
     if (isError) return <pre>{JSON.stringify(error)}</pre>;
     if (isLoading) return <LoadingIndicator />;
@@ -34,18 +38,17 @@ export default function Categories({
                                     options={categoryOptions}
                                     getOptionLabel={(d) => d.name ?? ""}
                                     getOptionValue={(d) => d.id}
-                                    // value={categoryOptions.filter(
-                                    //     (a) =>
-                                    //         attribution[id] &&
-                                    //         attribution[id]
-                                    //             .split(",")
-                                    //             .indexOf(a.id) !== -1
-                                    // )}
-                                    // onChange={(e) =>
-                                    //     attributionApi.add({
-                                    //         [id]: e.map((e) => e.id).join(","),
-                                    //     })
-                                    // }
+                                    value={categoryOptions.filter(
+                                        (a) =>
+                                            attribution?.[id]?.indexOf(a.id) !==
+                                            -1
+                                    )}
+                                    onChange={(e) =>
+                                        onChange(
+                                            id,
+                                            e.map((e) => e.id)
+                                        )
+                                    }
                                 />
                             </Box>
                         </Stack>

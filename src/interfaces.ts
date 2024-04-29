@@ -213,7 +213,24 @@ export interface Pagination {
     pageSize: number;
 }
 export interface DataNode extends IDataNode {
+    id?: string;
+    value?: string;
+    pId?: string;
+    children?: DataNode[];
+    type?: string;
+    nodeSource?: { [key: string]: any };
+    hasChildren?: boolean;
+    bg?: string;
+    actual?: string;
+    parent?: { [key: string]: any };
+    order?: string;
     level?: number;
+    metadata?: Partial<{
+        rows: number;
+        columns: number;
+        rowsPerPage: number;
+    }>;
+    filter?: string;
 }
 
 export interface Option extends OptionBase {

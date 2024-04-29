@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { ICategory, IDashboard } from "../../interfaces";
-import { getDHIS2NamespaceData } from "../../utils";
+import { ICategory, IDashboard } from "../interfaces";
+import { getDHIS2NamespaceData } from "../utils";
 
 export const useCategoryList = () => {
     return useQuery<

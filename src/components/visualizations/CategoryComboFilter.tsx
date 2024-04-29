@@ -1,11 +1,9 @@
 import { Progress, Stack } from "@chakra-ui/react";
 import { GroupBase, Select } from "chakra-react-select";
+import { useDHIS2CategoryCombos } from "../../hooks/useDHIS2CategoryCombos";
 import { INamed, MetadataAPI } from "../../interfaces";
-import { useDHIS2CategoryCombos } from "../hooks/useDHIS2CategoryCombos";
 
 export default function CategoryComboFilter({
-    api,
-    isCurrentDHIS2,
     value,
     onChange,
 }: MetadataAPI & {
@@ -13,7 +11,7 @@ export default function CategoryComboFilter({
     onChange: (val: string | undefined) => void;
 }) {
     const { isLoading, isSuccess, isError, error, data } =
-        useDHIS2CategoryCombos(isCurrentDHIS2, api);
+        useDHIS2CategoryCombos();
 
     if (isError) return <pre>{JSON.stringify(error)}</pre>;
 
@@ -23,10 +21,10 @@ export default function CategoryComboFilter({
         return (
             <Stack>
                 <Select<INamed, false, GroupBase<INamed>>
-                    options={data}
+                    options={data.categoryCombos}
                     getOptionLabel={(d) => d.name ?? ""}
                     getOptionValue={(d) => d.id}
-                    value={data.find((a) => a.id === value)}
+                    value={data.categoryCombos.find((a) => a.id === value)}
                     onChange={(e) => onChange(e?.id)}
                     menuPlacement="top"
                 />

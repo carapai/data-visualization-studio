@@ -19,7 +19,7 @@ import StackedArea from "./StackedArea";
 import SunburstChart from "./SunburstChart";
 import Tables from "./Tables";
 import TextVisualisation from "./TextVisualisation";
-import { useDHIS2Visualization } from "../hooks/useDHIS2Visualization";
+import { useDHIS2Visualization } from "../../hooks/useDHIS2Visualization";
 
 const getVisualization = (
     visualization: IVisualization,

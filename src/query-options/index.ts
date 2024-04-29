@@ -1,21 +1,22 @@
 import { queryOptions } from "@tanstack/react-query";
 import type { TreeDataNode } from "antd";
 
+import { db } from "@/db";
 import axiosInstance from "../axios-instance";
-import {
-    getDHIS2NamespaceData,
-    getDHIS2NamespaceKeyData,
-    getDHIS2Resource,
-    getDHIS2Resources,
-} from "../utils";
 import {
     CategoryCombo,
     DataNode,
     IDashboard,
     IDashboardSetting,
     ILevel,
+    INamed,
 } from "../interfaces";
-
+import {
+    getDHIS2NamespaceData,
+    getDHIS2NamespaceKeyData,
+    getDHIS2Resource,
+} from "../utils";
+import { AxiosInstance } from "axios";
 export const usersQueryOptions = queryOptions({
     queryKey: ["users"],
     queryFn: () => axiosInstance.get("users"),
@@ -28,40 +29,31 @@ export const initialQueryOptions = queryOptions({
             "i-dashboard-settings",
             "settings"
         );
-        // if (settings.defaultDashboard) {
-        //     const dashboard = await getDHIS2NamespaceKeyData<IDashboard>(
-        //         "i-dashboards",
-        //         settings.defaultDashboard
-        //     );
-        // }
-        // if (settings.template) {
-        //     const template = await getDHIS2NamespaceKeyData<IDashboard>(
-        //         "i-dashboards",
-        //         settings.template
-        //     );
-        // }
-        const data = await getDHIS2Resources<TreeDataNode>({
+        const { dataViewOrganisationUnits } = await getDHIS2Resource<{
+            dataViewOrganisationUnits: TreeDataNode[];
+        }>({
+            api: axiosInstance,
             resource: "me.json",
-            resourceKey: "dataViewOrganisationUnits",
-            isCurrentDHIS2: true,
             params: {
                 fields: "dataViewOrganisationUnits[id~rename(key),name~rename(title),leaf]",
             },
         });
-        const levels = await getDHIS2Resources<ILevel>({
+        const { organisationUnitLevels } = await getDHIS2Resource<{
+            organisationUnitLevels: ILevel[];
+        }>({
             resource: "organisationUnitLevels.json",
-            resourceKey: "organisationUnitLevels",
-            isCurrentDHIS2: true,
+            api: axiosInstance,
             params: {
                 fields: "id,name,level",
                 order: "level:asc",
             },
         });
         return {
-            organisationUnits: data,
+            organisationUnits: dataViewOrganisationUnits,
             ...settings,
-            maxLevel: levels[levels.length - 1].level,
-            minLevel: levels[0].level,
+            maxLevel:
+                organisationUnitLevels[organisationUnitLevels.length - 1].level,
+            minLevel: organisationUnitLevels[0].level,
         };
     },
 });
@@ -92,22 +84,23 @@ export const templateQueryOptions = (key: string) =>
                 "i-dashboards",
                 key
             );
+            await db.dashboards.put(dashboard);
             if (dashboard.categoryCombo) {
                 const categoryCombo = await getDHIS2Resource<CategoryCombo>({
-                    isCurrentDHIS2: true,
+                    api: axiosInstance,
                     resource: `categoryCombos/${dashboard.categoryCombo}.json`,
                     params: {
-                        fields: "categories[id,name,shortName,categoryOptions[id,name,startDate,endDate]],categoryOptionCombos[id,categoryOptions]",
+                        fields: "id,categories[id,name,shortName,categoryOptions[id,name,startDate,endDate]],categoryOptionCombos[id,categoryOptions]",
                     },
                 });
+                await db.categoryCombos.put(categoryCombo);
                 return { dashboard, categoryCombo };
             }
-
             return { dashboard };
         },
     });
 
-export const orgUnitChildrenOptions = (orgUnit: string) =>
+export const orgUnitChildrenOptions = (api: AxiosInstance, orgUnit: string) =>
     queryOptions({
         queryKey: ["user-organisations", orgUnit],
         queryFn: async () => {
@@ -115,7 +108,7 @@ export const orgUnitChildrenOptions = (orgUnit: string) =>
                 organisationUnits: Array<{ children: DataNode[] }>;
             }>({
                 resource: "organisationUnits.json",
-                isCurrentDHIS2: true,
+                api,
                 params: {
                     fields: "children[id~rename(key),name~rename(title),leaf~rename(isLeaf),level]",
                     filter: `id:in:[${orgUnit}]`,
@@ -125,3 +118,79 @@ export const orgUnitChildrenOptions = (orgUnit: string) =>
             return data.organisationUnits.flatMap(({ children }) => children);
         },
     });
+
+export const categoryCombosOptions = (api: AxiosInstance) => {
+    return queryOptions({
+        queryKey: ["category-combos"],
+        queryFn: async () => {
+            return getDHIS2Resource<{ categoryCombos: INamed[] }>({
+                resource: "categoryCombos.json",
+                params: {
+                    paging: "false",
+                    fields: "id,name",
+                    filter: "dataDimensionType:eq:ATTRIBUTE",
+                },
+                api,
+            });
+        },
+    });
+};
+
+export const orgUnitGroupsOptions = (api: AxiosInstance) => {
+    return queryOptions({
+        queryKey: ["org-unit-groups"],
+        queryFn: async () => {
+            return getDHIS2Resource<{ organisationUnitGroups: INamed[] }>({
+                resource: "organisationUnitGroups.json",
+                api,
+                params: {
+                    fields: "id,name",
+                },
+            });
+        },
+    });
+};
+export const orgUnitLevelsOptions = (api: AxiosInstance) => {
+    return queryOptions({
+        queryKey: ["org-unit-levels"],
+        queryFn: async () => {
+            return getDHIS2Resource<{ organisationUnitLevels: ILevel[] }>({
+                resource: "organisationUnitLevels.json",
+                api,
+                params: {
+                    fields: "id,name,level",
+                },
+            });
+        },
+    });
+};
+
+export const userOrgUnitsOptions = (api: AxiosInstance) => {
+    return queryOptions({
+        queryKey: ["user-organisations"],
+        queryFn: async () => {
+            return getDHIS2Resource<{ dataViewOrganisationUnits: DataNode[] }>({
+                resource: "me.json",
+                api,
+                params: {
+                    fields: "dataViewOrganisationUnits[id~rename(key),name~rename(title),leaf~rename(isLeaf),level]",
+                },
+            });
+        },
+    });
+};
+
+export const categoryComboOptions = (api: AxiosInstance, id: string) => {
+    return queryOptions({
+        queryKey: ["category-combo", id],
+        queryFn: async () => {
+            return getDHIS2Resource<CategoryCombo>({
+                params: {
+                    fields: "categories[id,name,shortName,categoryOptions[id,name,startDate,endDate]],categoryOptionCombos[id,categoryOptions]",
+                },
+                api,
+                resource: `categoryCombos/${id}.json`,
+            });
+        },
+    });
+};

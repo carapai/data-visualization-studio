@@ -1,12 +1,12 @@
-import { fromPairs, groupBy } from "lodash";
-import axiosInstance from "../axios-instance";
+import { db } from "@/db";
+import { Authentication, Option } from "@/interfaces";
+import axios, { AxiosInstance } from "axios";
 import dayjs, { ManipulateType } from "dayjs";
-import { evaluate } from "mathjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 import quarterOfYear from "dayjs/plugin/quarterOfYear";
-import axios, { AxiosInstance } from "axios";
-import { getOr } from "lodash/fp";
-import { Authentication, Option } from "@/interfaces";
+import { fromPairs, groupBy } from "lodash";
+import { evaluate } from "mathjs";
+import axiosInstance from "../axios-instance";
 import { colorSets, ColourTypes } from "./dhis2Utils";
 
 dayjs.extend(isoWeek);
@@ -486,10 +486,11 @@ export const flattenDHIS2Data = (
     return data;
 };
 
-export const deriveSingleValues = (
-    data: { [key: string]: any },
-    expression?: string
-) => {
+export const deriveSingleValues = async (expression?: string) => {
+    const prevData = await db.data.toArray();
+    const data = fromPairs(
+        prevData.map(({ visualizationId, data }) => [visualizationId, data[0]])
+    );
     if (expression !== undefined) {
         let finalExpression = expression;
         const all = expression.match(/#{\w+.?\w*}/g);
@@ -502,6 +503,7 @@ export const deriveSingleValues = (
                 finalExpression = finalExpression.replace(s, val);
             });
         }
+
         try {
             const evaluation = evaluate(finalExpression);
             return [{ value: evaluation }];
@@ -512,77 +514,65 @@ export const deriveSingleValues = (
 };
 
 export const getDHIS2Resource = async <T>({
-    isCurrentDHIS2,
-    params,
-    resource,
     api,
-}: Partial<{
-    params: { [key: string]: string };
+    resource,
+    params = {},
+}: {
     resource: string;
-    isCurrentDHIS2: boolean | undefined | null;
-    api: AxiosInstance | undefined | null;
-}>) => {
-    if (isCurrentDHIS2 && resource) {
-        const { data } = await axiosInstance.get<T>(resource, { params });
-
-        return data;
-    } else if (api && resource) {
-        const { data } = await api.get<T>(resource, {
-            params,
-        });
-        return data;
-    }
-    return {} as T;
+    api: AxiosInstance;
+    params?: { [key: string]: string };
+}) => {
+    const { data } = await api.get<T>(resource, {
+        params,
+    });
+    return data;
 };
 
-export const getDHIS2Resources = async <T>({
-    isCurrentDHIS2,
-    params,
-    resource,
-    resourceKey,
-    api,
-}: Partial<{
-    params: { [key: string]: string };
-    resource: string;
-    isCurrentDHIS2: boolean | undefined | null;
-    resourceKey: string;
-    api: AxiosInstance | undefined | null;
-    engine: any;
-}>) => {
-    if (isCurrentDHIS2 && resource && resourceKey) {
-        const { data } = await axiosInstance.get<{ [key: string]: T[] }>(
-            resource,
-            { params }
-        );
-        return getOr([], resourceKey, data);
-    } else if (isCurrentDHIS2 && resource) {
-        const { data } = await axiosInstance.get<T[]>(resource, { params });
-        return data;
-    } else if (api && resource && resourceKey) {
-        const { data } = await api.get<{ [key: string]: T[] }>(resource, {
-            params,
-        });
-        return data[resourceKey];
-    } else if (api && resource) {
-        const { data } = await api.get<T[]>(resource, {
-            params,
-        });
-        return data;
-    }
-    return [];
-};
+// export const getDHIS2Resources = async <T>({
+//     isCurrentDHIS2,
+//     params,
+//     resource,
+//     resourceKey,
+//     api,
+// }: Partial<{
+//     params: { [key: string]: string };
+//     resource: string;
+//     isCurrentDHIS2: boolean | undefined | null;
+//     resourceKey: string;
+//     api: AxiosInstance | undefined | null;
+//     engine: any;
+// }>) => {
+//     if (isCurrentDHIS2 && resource && resourceKey) {
+//         const { data } = await axiosInstance.get<{ [key: string]: T[] }>(
+//             resource,
+//             { params }
+//         );
+//         return getOr([], resourceKey, data);
+//     } else if (isCurrentDHIS2 && resource) {
+//         const { data } = await axiosInstance.get<T[]>(resource, { params });
+//         return data;
+//     } else if (api && resource && resourceKey) {
+//         const { data } = await api.get<{ [key: string]: T[] }>(resource, {
+//             params,
+//         });
+//         return data[resourceKey];
+//     } else if (api && resource) {
+//         const { data } = await api.get<T[]>(resource, {
+//             params,
+//         });
+//         return data;
+//     }
+//     return [];
+// };
 
-export const createAxios = (authentication: Authentication | undefined) => {
-    if (authentication) {
-        return axios.create({
-            baseURL: `${authentication.url}/api/`,
-            auth: {
-                username: authentication.username,
-                password: authentication.password,
-            },
-        });
-    }
-    return undefined;
+export const createAxios = (authentication: Authentication) => {
+    return axios.create({
+        baseURL: `${authentication.url}/api/`,
+        auth: {
+            username: authentication.username,
+            password: authentication.password,
+        },
+    });
 };
 
 export const findParameters = (visualization: any) => {
@@ -906,3 +896,19 @@ export const fixedPeriods = [
     "FYJUL",
     "FYAPR",
 ];
+
+export function arrayCombinations<T>(...arrays: T[][]): T[][] {
+    if (arrays.length === 0) return [[]];
+    return arrays.reduce(
+        (accumulator: T[][], currentArray: T[]) => {
+            const combinations: T[][] = [];
+            accumulator.forEach((accItem: T[]) => {
+                currentArray.forEach((currentItem: T) => {
+                    combinations.push([...accItem, currentItem]);
+                });
+            });
+            return combinations;
+        },
+        [[]] as T[][]
+    );
+}

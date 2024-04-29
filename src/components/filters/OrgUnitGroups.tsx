@@ -1,4 +1,4 @@
-import { useOrgUnitGroups } from "@/components/hooks/useOrgUnitGroups";
+import { useOrgUnitGroups } from "@/hooks/useOrgUnitGroups";
 import { INamed } from "@/interfaces";
 import { Stack, Text } from "@chakra-ui/react";
 import { GroupBase, Select } from "chakra-react-select";
